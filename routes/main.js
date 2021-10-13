@@ -63,7 +63,7 @@ router.post("/filter_users", (req, res) => {
         linkedin: "NO-DATA",
         designation: "NO-DATA",
         phone: "NO-DATA",
-        // email: "NO-DATA",
+        email: "NO-DATA",
       };
       if (search?.name?.length > 0)
         filterData.name = new RegExp(search?.name, "i");
@@ -73,8 +73,8 @@ router.post("/filter_users", (req, res) => {
         filterData.linkedin = new RegExp(search?.linkedin, "i");
       if (search?.design?.length > 0)
         filterData.designation = new RegExp(search?.design, "i");
-      // if (search?.email?.length > 0)
-      //   filterData.email = new RegExp(search?.email, "i");
+      if (search?.email?.length > 0)
+        filterData.email = new RegExp(search?.email, "i");
       if (search?.phone?.length > 0)
         filterData.phone = new RegExp(search?.phone, "i");
 
@@ -88,7 +88,7 @@ router.post("/filter_users", (req, res) => {
             { job_company_name: filterData.company },
             { linkedin_username: filterData.linkedin },
             { job_title_role: filterData.designation },
-            // { email: filterData.email },
+            { work_email: filterData.email },
             { mobile_phone: filterData.phone },
           ],
         })
@@ -141,5 +141,104 @@ router.post("/add-user", (req, res) => {
   }
   saveUsersList();
 });
+
+router.post("/saveemail", (req, res) => {
+  async function saveEmail() {
+    try {
+      await client.connect();
+      const database = client.db("SearchSAAS");
+
+      const collection1 = database.collection(`EmailCampaign`);
+      const query = req.body;
+      const alreadyExists = await collection1.count(query, { limit: 1 });
+      if (alreadyExists == 1) {
+        return res.json({
+          error: "This template is already saved!",
+          refNo: "",
+        });
+      }
+      const result = await collection1.insertOne(query);
+      console.log(result.insertedId);
+      return res.json({ refNo: result.insertedId, error: "" });
+    } catch (err) {
+      return res.json({ error: err.message, refNo: "" });
+    }
+  }
+  saveEmail();
+});
+
+router.post("/savecall", (req, res) => {
+  async function saveCall() {
+    try {
+      await client.connect();
+      const database = client.db("SearchSAAS");
+
+      const collection1 = database.collection(`CallCampaign`);
+      const query = req.body;
+
+      const result = await collection1.insertOne(query);
+      console.log(result.insertedId);
+      return res.json({ refNo: result.insertedId, error: "" });
+    } catch (err) {
+      return res.json({ error: err.message, refNo: "" });
+    }
+  }
+  saveCall();
+});
+
+router.get("/getcall", (req, res) => {
+  async function fetchUsersList() {
+    try {
+      await client.connect();
+      const database = client.db("SearchSAAS");
+
+      const collection = database.collection(`CallCampaign`);
+
+      const usersList = await collection.find().toArray();
+      res.json({ users: usersList, error: "" });
+    } catch (err) {
+      res.json({ error: err.message, users: "" });
+    }
+  }
+  fetchUsersList();
+});
+router.post("/savetask", (req, res) => {
+  async function saveCall() {
+    try {
+      await client.connect();
+      const database = client.db("SearchSAAS");
+
+      const collection1 = database.collection(`TaskCampaign`);
+      const query = req.body;
+
+      const result = await collection1.insertOne(query);
+      console.log(result.insertedId);
+      return res.json({ refNo: result.insertedId, error: "" });
+    } catch (err) {
+      return res.json({ error: err.message, refNo: "" });
+    }
+  }
+  saveCall();
+});
+
+router.get("/gettask", (req, res) => {
+  async function fetchUsersList() {
+    try {
+      await client.connect();
+      const database = client.db("SearchSAAS");
+
+      const collection = database.collection(`TaskCampaign`);
+
+      const usersList = await collection.find().toArray();
+      res.json({ users: usersList, error: "" });
+    } catch (err) {
+      res.json({ error: err.message, users: "" });
+    }
+  }
+  fetchUsersList();
+});
+
+// ;
+//
 
 module.exports = router;
