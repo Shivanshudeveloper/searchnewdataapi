@@ -11,7 +11,11 @@ const main = require("./routes/main");
 const db = require("./config/keys").MongoURI;
 // Connect MongoDB
 mongoose
-  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(db, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    autoIndex: false,
+  })
   .then(() => console.log("MongoDB Connected".green.bold))
   .catch((err) => console.log(err));
 

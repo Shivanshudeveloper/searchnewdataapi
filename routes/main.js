@@ -50,6 +50,36 @@ router.get("/fetch_users/:page/:rowsPerPage", (req, res) => {
   fetchUsersList();
 });
 
+router.post("/search_users", (req, res) => {
+  async function fetchUsersList() {
+    try {
+      const { searchField } = req.body;
+      await client.connect();
+      const database = client.db("SearchSAAS");
+      const collection = database.collection(`Users`);
+      const field = new RegExp(searchField, "i");
+      const usersList = await collection
+        .find({
+          $or: [
+            { first_name: field },
+            { last_name: field },
+            { job_company_name: field },
+            { linkedin_username: field },
+            { job_title_role: field },
+            { work_email: field },
+            { mobile_phone: field },
+          ],
+        })
+        .limit(200)
+        .toArray();
+
+      res.json({ users: usersList });
+    } catch (err) {
+      res.json({ error: err.message });
+    }
+  }
+  fetchUsersList();
+});
 router.post("/filter_users", (req, res) => {
   async function fetchUsersList() {
     try {
@@ -120,6 +150,56 @@ router.get("/fetch_saved_users", (req, res) => {
   fetchUsersList();
 });
 
+router.post("/add-all-user", (req, res) => {
+  async function saveUsersList() {
+    try {
+      await client.connect();
+      const database = client.db("SearchSAAS");
+
+      const collection1 = database.collection(`SavedUsers`);
+      const collection2 = database.collection(`Users`);
+      const query = req.body;
+
+      //  const userData=await collection.find(query)
+      query.forEach(async (_id) => {
+        try {
+          const result1 = await collection2.find({ id: _id });
+          const alreadyExists = await collection1.countDocuments(result1, {
+            limit: 1,
+          });
+          if (alreadyExists == 1) {
+            return res.json({
+              error: "This user is already saved!",
+              refNo: "",
+            });
+          }
+          console.log(result1);
+          const data = {
+            id: result1.id,
+            first_name: result1.first_name,
+            last_name: result1.last_name,
+            company: result1.job_company_name,
+            designation: result1.job_title,
+            country: result1.location_country,
+            linkedin: result1.linkedin_result1name,
+            email:
+              result1 && result1.emails && result1.emails.length > 0
+                ? result1.emails[0].address
+                : "N/A",
+            userInfoCompressed: result1,
+          };
+          // const result = await collection1.insertOne(data);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+      return res.json({ refNo: "", error: "" });
+    } catch (err) {
+      return res.json({ error: err.message, refNo: "" });
+    }
+  }
+  saveUsersList();
+});
 router.post("/add-user", (req, res) => {
   async function saveUsersList() {
     try {
