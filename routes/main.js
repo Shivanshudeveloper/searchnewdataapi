@@ -342,11 +342,19 @@ router.get('/random/:count', (req, res) => {
       'Bank Manager',
       'Accountant',
       'Secretary',
+      'Speaker',
       'Civil Engineer',
       'Doctor',
       'Teacher',
       'Professor',
       'Business Man',
+      'Soprts Man',
+      'Teacher',
+      'Worker',
+      'CFO',
+      'CEO',
+      'CTO',
+      'CMO'
     ]
 
     const { count } = req.params
@@ -369,6 +377,18 @@ router.get('/random/:count', (req, res) => {
       }
       randomData.push(data)
     }
+    const data2 = {
+      firstName: 'Mary',
+      lastName: 'Joxi',
+      email: 'marycard@hotmail.com',
+      phoneNumber: '4222 99382 12 2',
+      company: 'Infosys',
+      jobRole: 'Software Engineer',
+      country: 'Portugal',
+      facebookProfile: 'mary.net',
+      linkedinProfile: 'mary.net',
+    }
+    randomData.push(data2);
     res.send(randomData)
   } catch (error) {
     res.send(error)
