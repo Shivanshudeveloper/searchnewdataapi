@@ -10,6 +10,22 @@ const campaignSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    mailSend: {
+      type: Number,
+      default: 0,
+    },
+    mailDelivered: {
+      type: Number,
+      default: 0,
+    },
+    mailOpened: {
+      type: Number,
+      default: 0,
+    },
+    notDelivered: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

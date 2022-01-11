@@ -354,7 +354,7 @@ router.get('/random/:count', (req, res) => {
       'CFO',
       'CEO',
       'CTO',
-      'CMO'
+      'CMO',
     ]
 
     const { count } = req.params
@@ -388,7 +388,68 @@ router.get('/random/:count', (req, res) => {
       facebookProfile: 'mary.net',
       linkedinProfile: 'mary.net',
     }
-    randomData.push(data2);
+    randomData.push(data2)
+    res.send(randomData)
+  } catch (error) {
+    res.send(error)
+  }
+})
+
+// Database CRUD Operations
+// @GET Request to GET random details of random users of a specific country
+// GET
+router.get('/filter/:count/:country', (req, res) => {
+  try {
+    const jobs = [
+      'VP Marketing',
+      'Marketing Associate',
+      'Brand Manager',
+      'Technician',
+      'Software Engineer',
+      'Marketing Assistant',
+      'Electrician',
+      'Marketing Manager',
+      'SoftwareDeveloper',
+      'Marketing Coordinator',
+      'Project Manager',
+      'Bank Manager',
+      'Accountant',
+      'Secretary',
+      'Speaker',
+      'Civil Engineer',
+      'Doctor',
+      'Teacher',
+      'Professor',
+      'Business Man',
+      'Soprts Man',
+      'Teacher',
+      'Worker',
+      'CFO',
+      'CEO',
+      'CTO',
+      'CMO',
+    ]
+
+    const { count, country } = req.params
+    const randomData = []
+
+    for (let i = 0; i < count; i++) {
+      const card = faker.helpers.createCard()
+      const name = card.name.split(' ')
+      const randomIndex = Math.floor(Math.random() * jobs.length)
+      const data = {
+        firstName: name[0],
+        lastName: name[1],
+        email: card.email,
+        phoneNumber: card.phone,
+        company: card.company.name,
+        jobRole: jobs[randomIndex],
+        country: country,
+        facebookProfile: card.website,
+        linkedinProfile: card.website,
+      }
+      randomData.push(data)
+    }
     res.send(randomData)
   } catch (error) {
     res.send(error)
@@ -488,6 +549,30 @@ router.post('/campaign/create', async (req, res) => {
 
     if (data) {
       res.status(200).send(data)
+    }
+  } catch (error) {
+    res.send(`Error: ${error.message}`)
+  }
+})
+
+// Database CRUD Operations
+// @POST Request to Update the Campaign
+// POST
+router.put('/campaign/update', async (req, res) => {
+  try {
+    const { id, count } = req.body
+
+    const campaign = await Campaign.findById({ _id: id })
+
+    if (campaign) {
+      campaign.mailSend = count || campaign.mailSend
+      campaign.mailDelivered = count || campaign.mailDelivered
+
+      const updatedCampaign = await campaign.save()
+
+      res.status(200).send(updatedCampaign)
+    } else {
+      res.status(404).send({ error: 'Campaign Not Found' })
     }
   } catch (error) {
     res.send(`Error: ${error.message}`)
