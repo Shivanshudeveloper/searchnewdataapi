@@ -357,48 +357,84 @@ router.get('/random/:count', (req, res) => {
       'CMO',
     ]
 
+    const industries = [
+      'Agriculture',
+      'Automobiles',
+      'Banking',
+      'Aviation',
+      'BioTechnology',
+      'Cement',
+      'Chemicals',
+      'E-Commerce',
+      'Education',
+      'Financial',
+      'HealthCare',
+      'Infrastructure',
+      'Insurance',
+      'Manufacturing',
+      'Media',
+      'Oils and Gas',
+      'Ports',
+      'Railway',
+      'Roads',
+      'Science',
+      'Steel',
+      'Textile',
+      'Tourism',
+    ]
+
     const { count } = req.params
     const randomData = []
+
+    const fixData = {
+      firstName: 'Mary',
+      lastName: 'Joxi',
+      email: 'marycard@hotmail.com',
+      phoneNumber: '4222 99382 12 2',
+      company: 'Infosys',
+      industry: 'Textile',
+      jobRole: 'Software Engineer',
+      country: 'Portugal',
+      facebookProfile: 'mary.net',
+      linkedinProfile: 'mary.net',
+    }
 
     for (let i = 0; i < count; i++) {
       const card = faker.helpers.createCard()
       const name = card.name.split(' ')
-      const randomIndex = Math.floor(Math.random() * jobs.length)
+      const jobIndex = Math.floor(Math.random() * jobs.length)
+      const industryIndex = Math.floor(Math.random() * industries.length)
+
+      if (i === 5) {
+        randomData.push(fixData)
+        continue
+      }
+
       const data = {
         firstName: name[0],
         lastName: name[1],
         email: card.email,
         phoneNumber: card.phone,
         company: card.company.name,
-        jobRole: jobs[randomIndex],
+        industry: industries[industryIndex],
+        jobRole: jobs[jobIndex],
         country: card.address.country,
         facebookProfile: card.website,
         linkedinProfile: card.website,
       }
       randomData.push(data)
     }
-    const data2 = {
-      firstName: 'Mary',
-      lastName: 'Joxi',
-      email: 'marycard@hotmail.com',
-      phoneNumber: '4222 99382 12 2',
-      company: 'Infosys',
-      jobRole: 'Software Engineer',
-      country: 'Portugal',
-      facebookProfile: 'mary.net',
-      linkedinProfile: 'mary.net',
-    }
-    randomData.push(data2)
     res.send(randomData)
   } catch (error) {
-    res.send(error)
+    console.log(error)
+    res.send(`Internal Server Error: ${error.message}`)
   }
 })
 
 // Database CRUD Operations
-// @GET Request to GET random details of random users of a specific country
+// @GET Request to GET random details of random users after filter
 // GET
-router.get('/filter/:count/:country', (req, res) => {
+router.get('/filter/:count', (req, res) => {
   try {
     const jobs = [
       'VP Marketing',
@@ -430,21 +466,50 @@ router.get('/filter/:count/:country', (req, res) => {
       'CMO',
     ]
 
-    const { count, country } = req.params
+    const industries = [
+      'Agriculture',
+      'Automobiles',
+      'Banking',
+      'Aviation',
+      'BioTechnology',
+      'Cement',
+      'Chemicals',
+      'E-Commerce',
+      'Education',
+      'Financial',
+      'HealthCare',
+      'Infrastructure',
+      'Insurance',
+      'Manufacturing',
+      'Media',
+      'Oils and Gas',
+      'Ports',
+      'Railway',
+      'Roads',
+      'Science',
+      'Steel',
+      'Textile',
+      'Tourism',
+    ]
+
+    const { count } = req.params
     const randomData = []
 
     for (let i = 0; i < count; i++) {
       const card = faker.helpers.createCard()
       const name = card.name.split(' ')
-      const randomIndex = Math.floor(Math.random() * jobs.length)
+      const jobIndex = Math.floor(Math.random() * jobs.length)
+      const industryIndex = Math.floor(Math.random() * industries.length)
+
       const data = {
-        firstName: name[0],
-        lastName: name[1],
+        firstName: req.query.firstName || name[0],
+        lastName: req.query.lastName || name[1],
         email: card.email,
         phoneNumber: card.phone,
-        company: card.company.name,
-        jobRole: jobs[randomIndex],
-        country: country,
+        company: req.query.company || card.company.name,
+        industry: req.query.industry || industries[industryIndex],
+        jobRole: req.query.jobRole || jobs[jobIndex],
+        country: req.query.country || card.address.country,
         facebookProfile: card.website,
         linkedinProfile: card.website,
       }
@@ -452,7 +517,8 @@ router.get('/filter/:count/:country', (req, res) => {
     }
     res.send(randomData)
   } catch (error) {
-    res.send(error)
+    console.log(error)
+    res.send(`Internal Server Error: ${error.message}`)
   }
 })
 
