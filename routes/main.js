@@ -8,6 +8,12 @@ const Products_Model = require('../models/Products')
 const Campaign = require('../models/Campaigns')
 const SavedDetail = require('../models/SaveDetails')
 const nodemailer = require('nodemailer')
+const { names } = require('../seedData/names.js')
+const { industries } = require('../seedData/industries.js')
+const { jobs } = require('../seedData/jobs.js')
+const { temp } = require('../seedData/temp.js')
+
+console.log(names.length)
 
 // TEST
 // @GET TEST
@@ -325,67 +331,9 @@ router.get('/gettask', (req, res) => {
 // Database CRUD Operations
 // @GET Request to GET random details of random users
 // GET
-router.get('/random/:count', (req, res) => {
+router.get('/random', (req, res) => {
   try {
-    const jobs = [
-      'VP Marketing',
-      'Marketing Associate',
-      'Brand Manager',
-      'Technician',
-      'Software Engineer',
-      'Marketing Assistant',
-      'Electrician',
-      'Marketing Manager',
-      'SoftwareDeveloper',
-      'Marketing Coordinator',
-      'Project Manager',
-      'Bank Manager',
-      'Accountant',
-      'Secretary',
-      'Speaker',
-      'Civil Engineer',
-      'Doctor',
-      'Teacher',
-      'Professor',
-      'Business Man',
-      'Soprts Man',
-      'Teacher',
-      'Worker',
-      'CFO',
-      'CEO',
-      'CTO',
-      'CMO',
-    ]
-
-    const industries = [
-      'Agriculture',
-      'Automobiles',
-      'Banking',
-      'Aviation',
-      'BioTechnology',
-      'Cement',
-      'Chemicals',
-      'E-Commerce',
-      'Education',
-      'Financial',
-      'HealthCare',
-      'Infrastructure',
-      'Insurance',
-      'Manufacturing',
-      'Media',
-      'Oils and Gas',
-      'Ports',
-      'Railway',
-      'Roads',
-      'Science',
-      'Steel',
-      'Textile',
-      'Tourism',
-    ]
-
-    const { count } = req.params
     const randomData = []
-
     const fixData = {
       firstName: 'Mary',
       lastName: 'Joxi',
@@ -399,31 +347,35 @@ router.get('/random/:count', (req, res) => {
       linkedinProfile: 'mary.net',
     }
 
-    for (let i = 0; i < count; i++) {
+    //let i = 0
+
+    //const xx = names.slice(0, 1000)
+    console.log('fetching random data')
+
+    for (let i = 0; i < 2000; i++) {
       const card = faker.helpers.createCard()
-      const name = card.name.split(' ')
       const jobIndex = Math.floor(Math.random() * jobs.length)
       const industryIndex = Math.floor(Math.random() * industries.length)
 
       if (i === 5) {
         randomData.push(fixData)
-        continue
       }
-
+      //console.log(i)
       const data = {
-        firstName: name[0],
-        lastName: name[1],
-        email: card.email,
-        phoneNumber: card.phone,
-        company: card.company.name,
-        industry: industries[industryIndex],
-        jobRole: jobs[jobIndex],
-        country: card.address.country,
-        facebookProfile: card.website,
-        linkedinProfile: card.website,
+        firstName: names[i].firstName,
+        lastName: names[i].lastName,
+        email: names[i].email,
+        phoneNumber: names[i].phoneNumber || card.phone,
+        company: names[i].company || card.company.name,
+        industry: names[i].industry || industries[industryIndex],
+        jobRole: names[i].jobRole || jobs[jobIndex],
+        country: names[i].country || card.address.country,
+        facebookProfile: names[i].facebookProfile || card.website,
+        linkedinProfile: names[i].linkedinProfile || card.website,
       }
       randomData.push(data)
     }
+    console.log('fetched random data')
     res.send(randomData)
   } catch (error) {
     console.log(error)
@@ -436,64 +388,68 @@ router.get('/random/:count', (req, res) => {
 // GET
 router.get('/filter/:count', (req, res) => {
   try {
-    const jobs = [
-      'VP Marketing',
-      'Marketing Associate',
-      'Brand Manager',
-      'Technician',
-      'Software Engineer',
-      'Marketing Assistant',
-      'Electrician',
-      'Marketing Manager',
-      'SoftwareDeveloper',
-      'Marketing Coordinator',
-      'Project Manager',
-      'Bank Manager',
-      'Accountant',
-      'Secretary',
-      'Speaker',
-      'Civil Engineer',
-      'Doctor',
-      'Teacher',
-      'Professor',
-      'Business Man',
-      'Soprts Man',
-      'Teacher',
-      'Worker',
-      'CFO',
-      'CEO',
-      'CTO',
-      'CMO',
-    ]
-
-    const industries = [
-      'Agriculture',
-      'Automobiles',
-      'Banking',
-      'Aviation',
-      'BioTechnology',
-      'Cement',
-      'Chemicals',
-      'E-Commerce',
-      'Education',
-      'Financial',
-      'HealthCare',
-      'Infrastructure',
-      'Insurance',
-      'Manufacturing',
-      'Media',
-      'Oils and Gas',
-      'Ports',
-      'Railway',
-      'Roads',
-      'Science',
-      'Steel',
-      'Textile',
-      'Tourism',
-    ]
-
     const { count } = req.params
     const randomData = []
+
+    let first = false
+    let last = false
+    let company = false
+    let job = false
+    let industry = false
+
+    for (let i = 66500; i < names.length; i++) {
+      if (
+        req.query.firstName !== '' &&
+        names[i].firstName
+          .toLowerCase()
+          .includes(req.query.firstName.toLowerCase())
+      ) {
+        first = true
+      }
+
+      if (
+        req.query.lastName !== '' &&
+        names[i].lastName
+          .toLowerCase()
+          .includes(req.query.lastName.toLowerCase())
+      ) {
+        last = true
+      }
+
+      if (
+        req.query.company !== '' &&
+        names[i].company.toLowerCase().includes(req.query.company.toLowerCase())
+      ) {
+        company = true
+      }
+
+      if (
+        req.query.industry !== '' &&
+        names[i].industry
+          .toLowerCase()
+          .includes(req.query.industry.toLowerCase())
+      ) {
+        industry = true
+      }
+
+      if (
+        req.query.jobRole !== '' &&
+        names[i].jobRole.toLowerCase().includes(req.query.jobRole.toLowerCase())
+      ) {
+        job = true
+      }
+    }
+
+    if (
+      (first === false && req.query.firstName !== '') ||
+      (last === false && req.query.lastName !== '') ||
+      (company === false && req.query.company !== '') ||
+      (job === false && req.query.jobRole !== '') ||
+      (industry === false && req.query.industry !== '')
+    ) {
+      res.send([])
+      return
+    }
 
     for (let i = 0; i < count; i++) {
       const card = faker.helpers.createCard()
@@ -501,9 +457,112 @@ router.get('/filter/:count', (req, res) => {
       const jobIndex = Math.floor(Math.random() * jobs.length)
       const industryIndex = Math.floor(Math.random() * industries.length)
 
+      let firstName = null
+      let lastName = null
+      let companyName = null
+      let industryName = null
+      let jobName = null
+
+      if (first) {
+        firstName = req.query.firstName
+      }
+
+      if (last) {
+        lastName = req.query.lastName
+      }
+
+      if (industry) {
+        industryName = req.query.industry
+      }
+
+      if (company) {
+        companyName = req.query.company
+      }
+
+      if (job) {
+        jobName = req.query.jobRole
+      }
+
       const data = {
-        firstName: req.query.firstName || name[0],
-        lastName: req.query.lastName || name[1],
+        firstName: firstName || name[0],
+        lastName: lastName || name[1],
+        email: card.email,
+        phoneNumber: card.phone,
+        company: companyName || card.company.name,
+        industry: industryName || industries[industryIndex],
+        jobRole: jobName || jobs[jobIndex],
+        country: req.query.country || card.address.country,
+        facebookProfile: card.website,
+        linkedinProfile: card.website,
+      }
+
+      randomData.push(data)
+    }
+    res.send(randomData)
+  } catch (error) {
+    console.log(error)
+    res.send(`Internal Server Error: ${error.message}`)
+  }
+})
+
+// Database CRUD Operations
+// @GET Request to GET random details of random users after filter
+// GET
+router.get('/search/:count', (req, res) => {
+  try {
+    const { count } = req.params
+    const randomData = []
+
+    let first = false
+    let last = false
+
+    for (let i = 66500; i < names.length; i++) {
+      if (
+        names[i].firstName
+          .toLowerCase()
+          .includes(req.query.firstName.toLowerCase())
+      ) {
+        first = true
+        break
+      }
+
+      if (
+        names[i].lastName
+          .toLowerCase()
+          .includes(req.query.lastName.toLowerCase())
+      ) {
+        last = true
+        break
+      }
+    }
+
+    if (last === false && first === false) {
+      res.send([])
+      return
+    }
+
+    console.log(first, last)
+
+    for (let i = 0; i < count; i++) {
+      const card = faker.helpers.createCard()
+      const name = card.name.split(' ')
+      const jobIndex = Math.floor(Math.random() * jobs.length)
+      const industryIndex = Math.floor(Math.random() * industries.length)
+
+      let firstName = null
+      let lastName = null
+
+      if (first) {
+        firstName = req.query.firstName
+      }
+
+      if (last) {
+        lastName = req.query.lastName
+      }
+
+      const data = {
+        firstName: firstName || name[0],
+        lastName: lastName || name[1],
         email: card.email,
         phoneNumber: card.phone,
         company: req.query.company || card.company.name,
@@ -513,6 +572,7 @@ router.get('/filter/:count', (req, res) => {
         facebookProfile: card.website,
         linkedinProfile: card.website,
       }
+
       randomData.push(data)
     }
     res.send(randomData)
