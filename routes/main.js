@@ -371,7 +371,7 @@ router.get('/random', (req, res) => {
         jobRole: names[i].jobRole || jobs[jobIndex],
         country: names[i].country || card.address.country,
         facebookProfile: names[i].facebookProfile || card.website,
-        linkedinProfile: names[i].linkedinProfile || card.website,
+        linkedinProfile: names[i + 70000].linkedinProfile || card.website,
       }
       randomData.push(data)
     }
@@ -505,7 +505,7 @@ router.get('/filter/:count', (req, res) => {
   }
 })
 
-// Database CRUD Operations
+// @Database CRUD Operations
 // @GET Request to GET random details of random users after filter
 // GET
 router.get('/search/:count', (req, res) => {
@@ -515,33 +515,90 @@ router.get('/search/:count', (req, res) => {
 
     let first = false
     let last = false
+    let company = false
+    let job = false
+    let industry = false
+    let email = false
+    let linkedin = false
+    let country = false
 
     for (let i = 66500; i < names.length; i++) {
       if (
         names[i].firstName
           .toLowerCase()
-          .includes(req.query.firstName.toLowerCase())
+          .includes(req.query.search.toLowerCase())
       ) {
         first = true
         break
       }
 
       if (
-        names[i].lastName
-          .toLowerCase()
-          .includes(req.query.lastName.toLowerCase())
+        names[i].lastName.toLowerCase().includes(req.query.search.toLowerCase())
       ) {
         last = true
         break
       }
-    }
 
-    if (last === false && first === false) {
-      res.send([])
-      return
+      if (
+        names[i].company.toLowerCase().includes(req.query.search.toLowerCase())
+      ) {
+        company = true
+        break
+      }
+
+      if (
+        names[i].industry.toLowerCase().includes(req.query.search.toLowerCase())
+      ) {
+        industry = true
+        break
+      }
+
+      if (
+        names[i].jobRole.toLowerCase().includes(req.query.search.toLowerCase())
+      ) {
+        job = true
+        break
+      }
+
+      if (
+        names[i].email.toLowerCase().includes(req.query.search.toLowerCase())
+      ) {
+        email = true
+        break
+      }
+
+      if (
+        names[i].linkedinProfile
+          .toLowerCase()
+          .includes(req.query.search.toLowerCase())
+      ) {
+        linkedin = true
+        break
+      }
+
+      if (
+        names[i].country.toLowerCase().includes(req.query.search.toLowerCase())
+      ) {
+        country = true
+        break
+      }
     }
 
     console.log(first, last)
+
+    if (
+      last === false &&
+      first === false &&
+      company === false &&
+      job === false &&
+      industry === false &&
+      email === false &&
+      linkedin === false &&
+      country === false
+    ) {
+      res.send([])
+      return
+    }
 
     for (let i = 0; i < count; i++) {
       const card = faker.helpers.createCard()
@@ -551,26 +608,51 @@ router.get('/search/:count', (req, res) => {
 
       let firstName = null
       let lastName = null
+      let companyName = null
+      let jobName = null
+      let industryName = null
+      let emailName = null
+      let likedinName = null
+      let countryName = null
 
       if (first) {
-        firstName = req.query.firstName
+        firstName = req.query.search
       }
 
       if (last) {
-        lastName = req.query.lastName
+        lastName = req.query.search
+      }
+
+      if (company) {
+        companyName = req.query.search
+      }
+      if (job) {
+        jobName = req.query.search
+      }
+      if (industry) {
+        industryName = req.query.search
+      }
+      if (email) {
+        emailName = req.query.search
+      }
+      if (linkedin) {
+        likedinName = req.query.search
+      }
+      if (country) {
+        countryName = req.query.search
       }
 
       const data = {
         firstName: firstName || name[0],
         lastName: lastName || name[1],
-        email: card.email,
+        email: emailName || card.email,
         phoneNumber: card.phone,
-        company: req.query.company || card.company.name,
-        industry: req.query.industry || industries[industryIndex],
-        jobRole: req.query.jobRole || jobs[jobIndex],
-        country: req.query.country || card.address.country,
+        company: companyName || card.company.name,
+        industry: industryName || industries[industryIndex],
+        jobRole: jobName || jobs[jobIndex],
+        country: countryName || card.address.country,
         facebookProfile: card.website,
-        linkedinProfile: card.website,
+        linkedinProfile: likedinName || card.website,
       }
 
       randomData.push(data)
@@ -765,5 +847,42 @@ router.post('/sendEmail', async (req, res) => {
     console.log(error)
   }
 })
+
+// router.get('/gen', (req, res) => {
+//   try {
+//     const randomData = []
+
+//     const fn = ['何',
+// '李',
+// '陈',]
+
+//     for (let i = 0; i < 3; i++) {
+//       const card = faker.helpers.createCard()
+//       const name = faker.name.findName()
+//       const names = name.split(' ')
+//       const jobIndex = Math.floor(Math.random() * jobs.length)
+//       const industryIndex = Math.floor(Math.random() * industries.length)
+
+//       const data = {
+//         firstName: fn[i],
+//         lastName: names[1],
+//         email: card.email,
+//         phoneNumber: card.phone,
+//         company: card.company.name,
+//         industry: industries[industryIndex],
+//         jobRole: jobs[jobIndex],
+//         country: 'china',
+//         facebookProfile: card.website,
+//         linkedinProfile: card.website,
+//       }
+//       randomData.push(data)
+//     }
+//     console.log('fetched random data')
+//     res.send(randomData)
+//   } catch (error) {
+//     console.log(error)
+//     res.send(`Internal Server Error: ${error.message}`)
+//   }
+// })
 
 module.exports = router
