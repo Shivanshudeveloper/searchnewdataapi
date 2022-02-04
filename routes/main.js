@@ -11,7 +11,7 @@ const nodemailer = require('nodemailer')
 const { names } = require('../seedData/names.js')
 const { industries } = require('../seedData/industries.js')
 const { jobs } = require('../seedData/jobs.js')
-const { temp } = require('../seedData/temp.js')
+const { chineseLastNameArr } = require('../seedData/lastNameIndex.js')
 
 console.log(names.length)
 
@@ -522,6 +522,18 @@ router.get('/search/:count', (req, res) => {
     let linkedin = false
     let country = false
 
+    let firstName = null
+    let lastName = null
+    let companyName = null
+    let jobName = null
+    let industryName = null
+    let emailName = null
+    let likedinName = null
+    let countryName = null
+    let phoneNumber = null
+
+    let flag = false
+
     for (let i = 66500; i < names.length; i++) {
       if (
         names[i].firstName
@@ -529,6 +541,7 @@ router.get('/search/:count', (req, res) => {
           .includes(req.query.search.toLowerCase())
       ) {
         first = true
+        flag = true
         break
       }
 
@@ -605,15 +618,7 @@ router.get('/search/:count', (req, res) => {
       const name = card.name.split(' ')
       const jobIndex = Math.floor(Math.random() * jobs.length)
       const industryIndex = Math.floor(Math.random() * industries.length)
-
-      let firstName = null
-      let lastName = null
-      let companyName = null
-      let jobName = null
-      let industryName = null
-      let emailName = null
-      let likedinName = null
-      let countryName = null
+      const chineseIndex = Math.floor(Math.random() * chineseLastNameArr.length)
 
       if (first) {
         firstName = req.query.search
@@ -642,11 +647,21 @@ router.get('/search/:count', (req, res) => {
         countryName = req.query.search
       }
 
+      if (flag) {
+        lastName = chineseLastNameArr[chineseIndex]
+        countryName = 'China'
+        if (i + 70000 < names.length) {
+          likedinName = names[i + 70000].linkedinProfile
+        }
+        phoneNumber = Math.floor(10000000 + Math.random() * 900000)
+        phoneNumber = `+86${phoneNumber}`
+      }
+
       const data = {
         firstName: firstName || name[0],
         lastName: lastName || name[1],
         email: emailName || card.email,
-        phoneNumber: card.phone,
+        phoneNumber: phoneNumber || card.phone,
         company: companyName || card.company.name,
         industry: industryName || industries[industryIndex],
         jobRole: jobName || jobs[jobIndex],
