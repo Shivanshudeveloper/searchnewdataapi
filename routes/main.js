@@ -553,6 +553,20 @@ router.get('/search/:count', (req, res) => {
       }
 
       if (
+        names[i].country.toLowerCase().includes(req.query.search.toLowerCase())
+      ) {
+        country = true
+        break
+      }
+
+      if (
+        names[i].email.toLowerCase().includes(req.query.search.toLowerCase())
+      ) {
+        email = true
+        break
+      }
+
+      if (
         names[i].company.toLowerCase().includes(req.query.search.toLowerCase())
       ) {
         company = true
@@ -574,13 +588,6 @@ router.get('/search/:count', (req, res) => {
       }
 
       if (
-        names[i].email.toLowerCase().includes(req.query.search.toLowerCase())
-      ) {
-        email = true
-        break
-      }
-
-      if (
         names[i].linkedinProfile
           .toLowerCase()
           .includes(req.query.search.toLowerCase())
@@ -588,16 +595,7 @@ router.get('/search/:count', (req, res) => {
         linkedin = true
         break
       }
-
-      if (
-        names[i].country.toLowerCase().includes(req.query.search.toLowerCase())
-      ) {
-        country = true
-        break
-      }
     }
-
-    console.log(first, last)
 
     if (
       last === false &&
@@ -612,6 +610,8 @@ router.get('/search/:count', (req, res) => {
       res.send([])
       return
     }
+
+    console.log(first, last, company, job, industry, email, linkedin, country)
 
     for (let i = 0; i < count; i++) {
       const card = faker.helpers.createCard()
@@ -660,7 +660,9 @@ router.get('/search/:count', (req, res) => {
       const data = {
         firstName: firstName || name[0],
         lastName: lastName || name[1],
-        email: emailName || card.email,
+        email:
+          emailName ||
+          `${name[0].toLowerCase()}.${name[1].toLowerCase()}@gmail.com`,
         phoneNumber: phoneNumber || card.phone,
         company: companyName || card.company.name,
         industry: industryName || industries[industryIndex],
@@ -867,26 +869,27 @@ router.post('/sendEmail', async (req, res) => {
 //   try {
 //     const randomData = []
 
-//     const fn = ['何',
-// '李',
-// '陈',]
+//     //     const fn = ['何',
+//     // '李',
+//     // '陈',]
 
-//     for (let i = 0; i < 3; i++) {
+//     for (let i = 0; i < 10000; i++) {
 //       const card = faker.helpers.createCard()
 //       const name = faker.name.findName()
-//       const names = name.split(' ')
+//       const nameArr = name.split(' ')
+//       const email = `${nameArr[0]}.${nameArr[1]}@gmail.com`
 //       const jobIndex = Math.floor(Math.random() * jobs.length)
 //       const industryIndex = Math.floor(Math.random() * industries.length)
 
 //       const data = {
-//         firstName: fn[i],
-//         lastName: names[1],
-//         email: card.email,
+//         firstName: nameArr[0],
+//         lastName: nameArr[1],
+//         email: email,
 //         phoneNumber: card.phone,
 //         company: card.company.name,
 //         industry: industries[industryIndex],
 //         jobRole: jobs[jobIndex],
-//         country: 'china',
+//         country: 'Australia',
 //         facebookProfile: card.website,
 //         linkedinProfile: card.website,
 //       }
